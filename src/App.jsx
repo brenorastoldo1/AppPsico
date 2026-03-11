@@ -7,6 +7,7 @@ import './index.css';
 
 function App() {
   const [activeTab, setActiveTab] = useState('agenda');
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   // Initialize from LocalStorage or empty array
   const [appointments, setAppointments] = useState(() => {
@@ -58,9 +59,34 @@ function App() {
     // Keeping it simple as requested, but in a real app better to link by ID.
   };
 
+  // Close sidebar on route change on mobile
+  useEffect(() => {
+    const handleResize = () => {
+      if (window.innerWidth > 768) setIsSidebarOpen(false);
+    };
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
+
   return (
     <div className="layout-container">
-      <Sidebar activeTab={activeTab} onTabChange={setActiveTab} />
+      <div className="mobile-header">
+        <button
+          className="hamburger-btn"
+          onClick={() => setIsSidebarOpen(true)}
+          aria-label="Open menu"
+        >
+          ☰
+        </button>
+        <h1 className="mobile-title">MindSpace</h1>
+      </div>
+
+      <Sidebar
+        activeTab={activeTab}
+        onTabChange={setActiveTab}
+        isOpen={isSidebarOpen}
+        onClose={() => setIsSidebarOpen(false)}
+      />
       <main className="main-content">
         {activeTab === 'agenda' ? (
           <AgendaView
